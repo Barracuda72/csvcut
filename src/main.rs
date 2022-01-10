@@ -9,7 +9,10 @@ fn main() {
     }
 
     // Build the CSV reader and iterate over each record.
-    let mut rdr = csv::Reader::from_reader(io::stdin());
+    let mut rdr = csv::ReaderBuilder::new()
+        .flexible(true) // Number of columns can be different each line
+        .has_headers(false) // We're not interested in treating first line as header
+        .from_reader(io::stdin());
     let mut wtr = csv::Writer::from_writer(io::stdout());
 
     let mut errors = 0;
