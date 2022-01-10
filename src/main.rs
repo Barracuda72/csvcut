@@ -1,10 +1,11 @@
 use std::io;
+use std::collections::HashSet;
 
 fn main() {
-    let mut columns: Vec<i32> = std::env::args().skip(1).map(|x| x.parse().unwrap()).collect();
+    let mut columns: HashSet<usize> = std::env::args().skip(1).map(|x| x.parse().unwrap()).collect();
 
-    if columns.len() < 1 {
-        columns.push(0);
+    if columns.is_empty() {
+        columns.insert(0);
     }
 
     // Build the CSV reader and iterate over each record.
@@ -20,7 +21,14 @@ fn main() {
             Ok(record) => record,
             Err(e) => { eprintln!("Malformed CSV: {}!", e); errors += 1; continue; },
         };
-        wtr.write_record(&record).expect("Failed to write data!");
+        
+        let record = record
+            .into_iter()
+            .enumerate()
+            .filter(|&(i, _)| columns.contains(&i))
+            .map(|(_, e)| e);
+
+        wtr.write_record(record).expect("Failed to write data!");
     }
 
     eprintln!("Total errors: {}", errors);
