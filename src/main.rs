@@ -14,8 +14,8 @@ fn main() {
         .has_headers(false) // We're not interested in treating first line as header
         .from_reader(io::stdin());
     let mut wtr = csv::WriterBuilder::new()
-        .flexible(true) // Number of columns can be different each line
-        .has_headers(false) // We're not interested in treating first line as header
+        //.flexible(true) // Number of columns can be different each line
+        //.has_headers(false) // We're not interested in treating first line as header
         .from_writer(io::stdout());
 
     let mut errors = 0;
@@ -34,7 +34,7 @@ fn main() {
             .filter(|&(i, _)| columns.contains(&i))
             .map(|(_, e)| e);
 
-        wtr.write_record(record).expect("Failed to write data!");
+        wtr.write_record(record).unwrap_or_else(|e| eprintln!("Failed to write data: {}", e));
     }
 
     eprintln!("Total errors: {}", errors);
